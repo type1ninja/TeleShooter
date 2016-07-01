@@ -8,11 +8,12 @@ public class CharacterMove : MonoBehaviour {
 
 	CharacterController controller;
 
-	float speed = 20.0f;
-	float jumpSpeed = 5.0f;
+	float speed = 12.0f;
+	float jumpSpeed = 7.0f;
 	float gravity = Physics.gravity.y;
 
 	Vector3 moveDirection = Vector3.zero;
+	float upSpeed = 0;
 
 	bool canMove = true;
 
@@ -21,7 +22,6 @@ public class CharacterMove : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-
 		if (controller.isGrounded) {
 			moveDirection = GetInput ();
 			moveDirection = transform.TransformDirection(moveDirection);
@@ -30,19 +30,23 @@ public class CharacterMove : MonoBehaviour {
 			if (moveDirection.x != 0 && moveDirection.z != 0) {
 				moveDirection /= 1.4f;
 			}
-			if (GetJump()) {
-				moveDirection.y = jumpSpeed;
+			upSpeed = 0;
+			if (GetJump ()) {
+				upSpeed = jumpSpeed;
 			}
+		} else {
+			upSpeed += gravity * Time.deltaTime;
 		}
 
 		//ADD gravity because it's negative
-		moveDirection.y += gravity * Time.deltaTime;
+		moveDirection.y = upSpeed;
 
 		controller.Move(moveDirection * Time.deltaTime);
 	}
 
 	public void StopMotion() {
 		moveDirection = Vector3.zero;
+		upSpeed = 0;
 	}
 
 	//Enemies can add knockback by basically adding a vector to the player's move, then lifting them into the air
